@@ -8,10 +8,10 @@ A web-based Vacation Bible School registration system built with Next.js, Xata (
 
 ## Tech Stack
 
-- **Frontend**: Next.js (App Router, TypeScript)
+- **Frontend**: Next.js (App Router, TypeScript and TailwindCSS with Shadcn/UI)
 - **Auth**: Clerk or Kinde
-- **Database**: Xata (PostgreSQL mode)
-- **Hosting**: Vercel
+- **Database**: Digital Ocean DB Cluster (PostgreSQL mode)
+- **Hosting**: Digital Ocean Droplet or App Platform
 - **PDF Export**: HTML-to-PDF library (`@react-pdf/renderer`, `html2pdf.js`)
 - **Optional Storage**: Cloudflare R2 or AWS S3 for scanned forms
 
