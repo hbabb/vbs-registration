@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+if git status --short | grep --quiet '^MM'; then
+  printf '%s\n' "ERROR: Some staged files have unstaged changes" >&2
+  exit 1;
+fi
+
+# Run ESLint on all staged JavaScript and TypeScript files in src/
+git diff --cached --name-only --diff-filter=d | grep '^src/.*\.\(js\|jsx\|ts\|tsx\)$' | xargs --no-run-if-empty npx eslint --fix
+
+# Run Prettier on all staged files in src/
+git diff --cached --name-only --diff-filter=d | grep '^src/.*\.\(js\|jsx\|ts\|tsx\|css\|json\|md\)$' | xargs --no-run-if-empty npx prettier --write
+
+# Add fixed files back to Git
+git diff --cached --name-only --diff-filter=d | grep '^src/.*\.\(js\|jsx\|ts\|tsx\|css\|json\|md\)$' | xargs --no-run-if-empty git add
