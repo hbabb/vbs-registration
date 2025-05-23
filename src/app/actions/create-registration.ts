@@ -1,42 +1,74 @@
-'use server';
+'user server';
 
 import { db } from '@/db/index';
-import { children, emergencyContacts, guardians, medicalInformation, permissions } from '@/db/schema';
-import { registrationFormData } from '@/types/registration';
+import {
+    children,
+    emergencyContacts,
+    guardians,
+    medicalInformation,
+    permissions,
+} from '@/db/schema';
+import { registrationSchema } from '@/schemas/formSchema';
+import { createSafeActionClient } from 'next-safe-action';
 
-// Handles complete registration insert across multiple tables
-export const createRegistration = async (formData: registrationFormData) => {
-    // Insert guardian data and get the ID
-    const [guardian] = await db.insert(guardians).values(formData.guardians).returning({ id: guardians.id });
+// Create a safe action client
+const actionClient = createSafeActionClient();
 
-    // Insert child data and get the ID
-    const [child] = await db
-        .insert(children)
-        .values({
-            ...formData.children,
-            guardianId: guardian.id,
-        })
-        .returning({ id: children.id });
+export const createRegistration = actionClient
+    .schema(registrationSchema)
+    .action(async ({ parsedInput: formData }) => {
+        try {
+            // Insert guardian data and get the ID
+            const [guardian] = await db
+                .insert(guardians)
+                .values(formData.guardians)
+                .returning({ id: guardians.id });
 
-    // Insert emergency contact info provided
-    if (formData.emergencyContacts) {
-        await db.insert(emergencyContacts).values({
-            childId: child.id,
-            ...formData.emergencyContacts,
-        });
-    }
+            if (!guardian) {
+                throw new Error('Failed to create guardian record');
+            }
 
-    // Insert medical info if provided
-    if (formData.medicalInformation) {
-        await db.insert(medicalInformation).values({
-            childId: child.id,
-            ...formData.medicalInformation,
-        });
-    }
+            // Insert child data and get ID
+            const [child] = await db
+                .insert(children)
+                .values({
+                    ...formData.children,
+                    guardianId: guardian.id,
+                })
+                .returning({ id: children.id });
 
-    // Insert permissions (required)
-    await db.insert(permissions).values({
-        childId: child.id,
-        ...formData.permissions,
+            if (!child) {
+                throw new Error('Failed to create child record');
+            }
+
+            // Insert emergency contact information
+            await db.insert(emergencyContacts).values({
+                childId: child.id,
+                ...formData.emergencyContacts,
+            });
+
+            // Insert medical information
+            await db.insert(medicalInformation).values({
+                childId: child.id,
+                ...formData.medicalInformation,
+            });
+
+            // Insert permissions (required)
+            await db.insert(permissions).values({
+                childId: child.id,
+                ...formData.permissions,
+            });
+
+            return {
+                success: true,
+                message: 'Registration completed successfully!',
+                childId: child.id,
+                guardianId: guardian.id,
+            };
+        } catch (error) {
+            console.error('Registration error: ', error);
+            throw new Error(
+                'Failed to complete registration. Please try again. If error persists, contact support@motlowministries.com',
+            );
+        }
     });
-};
