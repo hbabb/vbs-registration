@@ -43,3 +43,6 @@ next-env.d.ts
 
 # DB Certificates
 /cert/
+
+# Sentry Config File
+.env.sentry-build-plugin

@@ -1,12 +1,25 @@
 import { cn } from '@/lib/utils';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Luckiest_Guy, Montserrat } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
     subsets: ['latin'],
-    variable: '--font-sans',
+    variable: '--font-inter',
+    display: 'swap',
+});
+
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    variable: '--font-montserrat',
+    display: 'swap',
+});
+
+const luckiestGuy = Luckiest_Guy({
+    weight: '400',
+    subsets: ['latin'],
+    variable: '--font-luckiest',
     display: 'swap',
 });
 
@@ -22,8 +35,17 @@ export default function RootLayout({
 }>) {
     return (
         <ClerkProvider afterSignOutUrl="/">
-            <html lang="en" suppressHydrationWarning>
-                <body className={cn('flex min-h-screen flex-col', inter.className)}>{children}</body>
+            <html
+                lang="en"
+                className={`${inter.variable} ${montserrat.variable} ${luckiestGuy.variable}`}
+                suppressHydrationWarning>
+                <body
+                    className={cn(
+                        'flex min-h-screen flex-col',
+                        inter.className,
+                    )}>
+                    {children}
+                </body>
             </html>
         </ClerkProvider>
     );

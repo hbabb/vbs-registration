@@ -1,4 +1,4 @@
-'user server';
+'use server';
 
 import { db } from '@/db/index';
 import {
@@ -56,7 +56,7 @@ export const createRegistration = actionClient
             // Insert permissions (required)
             await db.insert(permissions).values({
                 childId: child.id,
-                ...formData.permissions,
+                ...formData.consent,
             });
 
             return {

@@ -28,7 +28,7 @@ interface FormInputProps<T extends FieldValues> {
     // Mark the input as required
     required?: boolean;
     // HTML input type
-    type?: 'text' | 'email' | 'phone' | 'password' | 'number';
+    type?: 'text' | 'email' | 'tel' | 'password' | 'number' | 'date';
     // Mark the input disabled
     disabled?: boolean;
     // Additional CSS classes

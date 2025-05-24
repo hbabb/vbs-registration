@@ -1,15 +1,18 @@
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
+import { Footer } from '@/components/page/Footer';
+import { Header } from '@/components/page/Header';
+import { RegistrationForm } from '@/components/page/RegistrationForm';
 
 export default function Home() {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-between p-2">
-            <Header />
-            {/* TODO: Add form here (use a Form component to avoid making this a client component) */}
-            <main className="flex w-full flex-1 flex-col items-center justify-center text-center">
-                <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
-            </main>
-            <Footer />
+        <div className="min-h-screen p-4">
+            <div className="flex min-h-screen flex-col items-center md:rounded-lg md:bg-[url('/vbs-logo.jpg')] md:bg-contain md:bg-fixed md:bg-center md:bg-no-repeat">
+                <Header />
+                {/* TODO: Add form here (use a Form component to avoid making this a client component) */}
+                <main className="flex w-full flex-1 flex-col items-center justify-center text-center">
+                    <RegistrationForm />
+                </main>
+                <Footer />
+            </div>
         </div>
     );
 }
