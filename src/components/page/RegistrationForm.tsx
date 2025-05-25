@@ -6,10 +6,11 @@
  * Main registration form wrapper component that handles all form logic
  * Contains useForm hook, validation, submission, and renders all form sections
  * This is a client component that wraps server-rendered page content
- * Handles multi-step form flow and state management
+ * Handles multistep form flow and state management
  */
 
 import { createRegistration } from '@/app/actions/createRegistration';
+import { FormInput } from '@/components/form/FormInput';
 import { Form } from '@/components/ui/form';
 import { type RegistrationFormData } from '@/schemas/formSchema';
 import { useAction } from 'next-safe-action/hooks';
@@ -20,10 +21,17 @@ import { ChildInfo } from '../views/ChildInfo';
 import { Consent } from '../views/Consent';
 import { EmergencyContact } from '../views/EmergencyContact';
 import { GuardianInfo } from '../views/GuardianInfo';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registrationSchema } from '@/schemas/formSchema';
+import { useState } from 'react';
 
 export function RegistrationForm() {
+    // Set sart time for registration
+    const [startTime] = useState(Date.now());
     // Initialize form with react-hook-form and Zod validation
     const form = useForm<RegistrationFormData>({
+        resolver: zodResolver(registrationSchema),
+        mode: 'all',
         defaultValues: {
             guardians: {
                 firstName: '',
@@ -63,6 +71,9 @@ export function RegistrationForm() {
                 photoRelease: false,
                 consentGiven: false,
             },
+            honeypot: '',
+            honeypot2: '',
+            submissionTime: 0,
         },
     });
 
@@ -94,7 +105,8 @@ export function RegistrationForm() {
 
     // Form submission handler
     const onSubmit = (data: RegistrationFormData) => {
-        execute(data);
+        const submissionTime = Date.now() - startTime;
+        execute({ ...data, submissionTime });
     };
 
     return (
@@ -144,6 +156,21 @@ export function RegistrationForm() {
                                 ? 'Submitting...'
                                 : 'Submit Registration'}
                         </Button>
+                    </div>
+                    {/*In your RegistrationForm.tsx, add hidden fields:*/}
+                    <div style={{ display: 'none' }}>
+                        <FormInput
+                            form={form}
+                            name="honeypot"
+                            label="Leave this blank"
+                            placeholder=""
+                        />
+                        <FormInput
+                            form={form}
+                            name="honeypot2"
+                            label="Do not fill this field"
+                            placeholder=""
+                        />
                     </div>
                 </form>
             </Form>

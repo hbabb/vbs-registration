@@ -7,35 +7,37 @@
  */
 
 import { z } from 'zod';
+import {
+    nameValidation,
+    emailValidation,
+    phoneValidation,
+    optionalPhoneValidation,
+    addressValidation,
+    optionalAddressValidation,
+    cityValidation,
+    stateValidation,
+    zipValidation,
+} from '@/schemas/validationHelpers';
 
 // Zod schema for validation
 export const registrationSchema = z.object({
     guardians: z.object({
-        firstName: z.string().min(1, { message: 'First name is required' }),
-        lastName: z.string().min(1, { message: 'Last name is required' }),
-        email: z.string().email({ message: 'Valid email is required' }),
-        phonePrimary: z
-            .string()
-            .min(10, { message: 'Phone number must be at least 10 digits' }),
-        phoneAlternate: z.string().optional(),
-        address1: z.string().min(1, { message: 'Address is required' }),
-        address2: z.string().optional(),
-        city: z.string().min(1, { message: 'City is required' }),
-        state: z.string().length(2, { message: 'State must be 2 characters' }),
-        zip: z
-            .string()
-            .min(5, { message: 'ZIP code must be at least 5 digits' })
-            .max(10),
+        firstName: nameValidation,
+        lastName: nameValidation,
+        email: emailValidation,
+        phonePrimary: phoneValidation,
+        phoneAlternate: optionalPhoneValidation,
+        address1: addressValidation,
+        address2: optionalAddressValidation,
+        city: cityValidation,
+        state: stateValidation,
+        zip: zipValidation,
     }),
     children: z
         .array(
             z.object({
-                firstName: z
-                    .string()
-                    .min(1, { message: 'First name is required' }),
-                lastName: z
-                    .string()
-                    .min(1, { message: 'Last name is required' }),
+                firstName: nameValidation,
+                lastName: nameValidation,
                 dateOfBirth: z
                     .string()
                     .min(1, { message: 'Date of birth is required' }),
@@ -54,15 +56,9 @@ export const registrationSchema = z.object({
     emergencyContacts: z
         .array(
             z.object({
-                firstName: z
-                    .string()
-                    .min(1, 'Emergency contact first name is required'),
-                lastName: z
-                    .string()
-                    .min(1, 'Emergency contact last name is required'),
-                phonePrimary: z
-                    .string()
-                    .min(10, 'Emergency contact phone is required'),
+                firstName: nameValidation,
+                lastName: nameValidation,
+                phonePrimary: phoneValidation,
                 relationship: z.string().min(1, 'Relationship is required'),
             }),
         )
@@ -70,10 +66,16 @@ export const registrationSchema = z.object({
         .max(3, 'Maximum 3 emergency contacts allowed'),
     consent: z.object({
         photoRelease: z.boolean(),
-        consentGiven: z.boolean().refine(val => val === true, {
+        consentGiven: z.boolean().refine(val => val, {
             message: 'Consent must be given to proceed with registration',
         }),
     }),
+
+    honeypot: z.string().max(0, { message: 'Bot detected' }),
+    honeypot2: z.string().max(0, { message: 'Bot detected' }),
+    submissionTime: z
+        .number()
+        .min(5000, { message: 'Form submitted too quickly' }),
 });
 
 // Export the inferred type for TypeScript

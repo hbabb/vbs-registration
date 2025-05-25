@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/db/index';
+import { db } from '@/db';
 import {
     children,
     consent,
@@ -14,6 +14,8 @@ import {
     type RegistrationFormData,
 } from '@/schemas/formSchema';
 import { flattenValidationErrors } from 'next-safe-action';
+import { eq } from 'drizzle-orm';
+// import { Resend } from 'resend';
 
 export const createRegistration = actionClient
     .metadata({ actionName: 'createRegistration' })
@@ -27,6 +29,22 @@ export const createRegistration = actionClient
         }: {
             parsedInput: RegistrationFormData;
         }) => {
+            // Security checks
+            if (formData.honeypot || formData.honeypot2) {
+                throw new Error('Invalid submission detected');
+            }
+
+            const existingGuardian = await db
+                .select()
+                .from(guardians)
+                .where(eq(guardians.email, formData.guardians[0].email))
+                .limit(1);
+
+            if (existingGuardian.length > 0) {
+                throw new Error(
+                    'A registration already exists for this email address. Please contact us if you believe this is an error.',
+                );
+            }
             // Insert guardian and get the ID
             // We can spread all guardian fields because form structure matches DB schema exactly
             const [guardian] = await db
