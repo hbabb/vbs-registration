@@ -1,18 +1,14 @@
 import { db } from '@/db/index';
-import { config } from 'dotenv';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-
-config({ path: '.env.local' });
+import { migrate } from 'drizzle-orm/neon-http/migrator';
 
 const main = async () => {
     try {
         await migrate(db, {
-            migrationsFolder: './drizzle',
+            migrationsFolder: 'src/db/drizzle',
         });
-        console.log('Migrations completed successfully.');
-        process.exit(0);
+        console.log('Migration Completed! :tada:');
     } catch (error) {
-        console.error('Error during migrations:', error);
+        console.error('Error during migration: ', error);
         process.exit(1);
     }
 };

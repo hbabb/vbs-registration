@@ -1,7 +1,14 @@
 import { relations } from 'drizzle-orm';
-import { boolean, date, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+    boolean,
+    date,
+    pgTable,
+    timestamp,
+    uuid,
+    varchar,
+} from 'drizzle-orm/pg-core';
 
-// Guardian table
+// Guardian table (no changes needed)
 export const guardians = pgTable('guardians', {
     id: uuid('id').primaryKey().defaultRandom(),
     firstName: varchar('first_name').notNull(),
@@ -21,7 +28,7 @@ export const guardians = pgTable('guardians', {
         .$onUpdate(() => new Date()),
 });
 
-// Child table
+// Child table (no changes needed)
 export const children = pgTable('children', {
     id: uuid('id').primaryKey().defaultRandom(),
     guardianId: uuid('guardian_id')
@@ -39,7 +46,7 @@ export const children = pgTable('children', {
         .$onUpdate(() => new Date()),
 });
 
-// Emergency Contact table
+// Emergency Contact table - UPDATED (removed email, kept only phonePrimary)
 export const emergencyContacts = pgTable('emergency_contacts', {
     id: uuid('id').primaryKey().defaultRandom(),
     childId: uuid('child_id')
@@ -47,9 +54,7 @@ export const emergencyContacts = pgTable('emergency_contacts', {
         .references(() => children.id),
     firstName: varchar('first_name').notNull(),
     lastName: varchar('last_name').notNull(),
-    email: varchar('email').notNull(),
     phonePrimary: varchar('phone').notNull(),
-    phoneAlternate: varchar('phone_alternate'),
     relationship: varchar('relationship').notNull(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at')
@@ -58,16 +63,15 @@ export const emergencyContacts = pgTable('emergency_contacts', {
         .$onUpdate(() => new Date()),
 });
 
-// Medical Information table
+// Medical Information table - UPDATED with new field names
 export const medicalInformation = pgTable('medical_information', {
     id: uuid('id').primaryKey().defaultRandom(),
     childId: uuid('child_id')
         .notNull()
         .references(() => children.id),
-    allergies: varchar('allergies'),
-    medications: varchar('medications'),
-    medicalConditions: varchar('medical_conditions'),
+    foodAllergies: varchar('food_allergies'),
     dietaryRestrictions: varchar('dietary_restrictions'),
+    emergencyMedical: varchar('emergency_medical'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at')
         .notNull()
@@ -75,16 +79,17 @@ export const medicalInformation = pgTable('medical_information', {
         .$onUpdate(() => new Date()),
 });
 
-// Permissions table
-export const permissions = pgTable('permissions', {
+// Consent table - RENAMED from permissions, removed pickupNotes
+export const consent = pgTable('consent', {
     id: uuid('id').primaryKey().defaultRandom(),
     childId: uuid('child_id')
         .notNull()
         .references(() => children.id),
     photoRelease: boolean('photo_release').notNull(),
-    pickupNotes: varchar('pickup_notes'),
     consentGiven: boolean('consent_given').notNull(),
-    consentTimestamp: timestamp('consent_timestamp', { withTimezone: true }).notNull().defaultNow(),
+    consentTimestamp: timestamp('consent_timestamp', { withTimezone: true })
+        .notNull()
+        .defaultNow(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at')
         .notNull()
@@ -92,8 +97,7 @@ export const permissions = pgTable('permissions', {
         .$onUpdate(() => new Date()),
 });
 
-// Relationships
-
+// Relations - UPDATED
 export const guardiansRelations = relations(guardians, ({ many }) => ({
     children: many(children),
 }));
@@ -105,26 +109,32 @@ export const childrenRelations = relations(children, ({ one, many }) => ({
     }),
     emergencyContacts: many(emergencyContacts),
     medicalInformation: many(medicalInformation),
-    permissions: many(permissions),
+    consent: many(consent),
 }));
 
-export const emergencyContactsRelations = relations(emergencyContacts, ({ one }) => ({
-    children: one(children, {
-        fields: [emergencyContacts.childId],
-        references: [children.id],
+export const emergencyContactsRelations = relations(
+    emergencyContacts,
+    ({ one }) => ({
+        children: one(children, {
+            fields: [emergencyContacts.childId],
+            references: [children.id],
+        }),
     }),
-}));
+);
 
-export const medicalInformationRelations = relations(medicalInformation, ({ one }) => ({
-    children: one(children, {
-        fields: [medicalInformation.childId],
-        references: [children.id],
+export const medicalInformationRelations = relations(
+    medicalInformation,
+    ({ one }) => ({
+        children: one(children, {
+            fields: [medicalInformation.childId],
+            references: [children.id],
+        }),
     }),
-}));
+);
 
-export const permissionsRelations = relations(permissions, ({ one }) => ({
+export const consentRelations = relations(consent, ({ one }) => ({
     children: one(children, {
-        fields: [permissions.childId],
+        fields: [consent.childId],
         references: [children.id],
     }),
 }));

@@ -70,7 +70,6 @@ export const registrationSchema = z.object({
         .max(3, 'Maximum 3 emergency contacts allowed'),
     consent: z.object({
         photoRelease: z.boolean(),
-        pickupNotes: z.string().optional(),
         consentGiven: z.boolean().refine(val => val === true, {
             message: 'Consent must be given to proceed with registration',
         }),

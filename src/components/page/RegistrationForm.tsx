@@ -9,7 +9,7 @@
  * Handles multi-step form flow and state management
  */
 
-import { createRegistration } from '@/app/actions/create-registration';
+import { createRegistration } from '@/app/actions/createRegistration';
 import { Form } from '@/components/ui/form';
 import { type RegistrationFormData } from '@/schemas/formSchema';
 import { useAction } from 'next-safe-action/hooks';
@@ -61,7 +61,6 @@ export function RegistrationForm() {
             ],
             consent: {
                 photoRelease: false,
-                pickupNotes: '',
                 consentGiven: false,
             },
         },
@@ -120,7 +119,7 @@ export function RegistrationForm() {
                     <EmergencyContact form={form} />
 
                     {/* Consent Section */}
-                    <Consent />
+                    <Consent form={form} />
 
                     {/* Submit Button */}
                     <div className="justify-start-safe flex pt-4">
