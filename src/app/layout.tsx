@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
@@ -44,7 +45,8 @@ export default function RootLayout({
                         'flex min-h-screen flex-col',
                         inter.className,
                     )}>
-                    {children}
+                    <main>{children}</main>
+                    <Toaster richColors />
                 </body>
             </html>
         </ClerkProvider>

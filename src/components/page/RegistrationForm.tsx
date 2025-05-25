@@ -69,13 +69,25 @@ export function RegistrationForm() {
     // Server action hook for form submission
     const { execute, status } = useAction(createRegistration, {
         onSuccess: data => {
-            toast.success(`🎉 ${data?.data?.message}`); // Adds emoji to server message
+            toast.success(`✅ ${data?.data?.message}`, {
+                style: {
+                    background: '#059669', // muted green
+                    color: 'white',
+                    border: 'none',
+                },
+            });
             form.reset();
         },
         onError: error => {
             toast.error(
-                error.error?.serverError ||
-                    ':heavy_exclamation_mark: Registration failed. Please try again',
+                `❌ ${error.error?.serverError || 'Registration failed. Please try again'}`,
+                {
+                    style: {
+                        background: '#DC2626', // muted red
+                        color: 'white',
+                        border: 'none',
+                    },
+                },
             );
         },
     });
