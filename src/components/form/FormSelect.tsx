@@ -11,6 +11,7 @@ import {
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import {
     Select,
@@ -87,6 +88,7 @@ export function FormSelect<T extends FieldValues>({
                             ))}
                         </SelectContent>
                     </Select>
+                    <FormMessage />
                 </FormItem>
             )}
         />

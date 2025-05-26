@@ -5,7 +5,7 @@ import { FaFacebook, FaGithub } from 'react-icons/fa6';
 
 export function Footer() {
     return (
-        <footer className="flex h-28 w-full max-w-7xl flex-col items-center justify-between rounded-2xl bg-white/50 p-4 text-white md:h-16 md:flex-row">
+        <footer className="flex h-28 w-full max-w-4xl flex-col items-center justify-between rounded-2xl bg-white/50 p-4 text-white md:h-16 md:flex-row">
             <div className="mr-[-1rem] hidden md:block">
                 <Link href="/" className="flex items-center space-x-4">
                     <Image

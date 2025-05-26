@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/db/index';
+import { db } from '@/db';
 import {
     children,
     consent,
@@ -14,6 +14,9 @@ import {
     type RegistrationFormData,
 } from '@/schemas/formSchema';
 import { flattenValidationErrors } from 'next-safe-action';
+import { eq } from 'drizzle-orm';
+import { sendEmail } from '@/lib/emailService';
+import { createRegistrationConfirmationEmail } from '@/lib/emailTemplates';
 
 export const createRegistration = actionClient
     .metadata({ actionName: 'createRegistration' })
@@ -27,11 +30,27 @@ export const createRegistration = actionClient
         }: {
             parsedInput: RegistrationFormData;
         }) => {
+            // Security checks
+            if (formData.honeypot || formData.honeypot2) {
+                throw new Error('Invalid submission detected');
+            }
+
+            const existingGuardian = await db
+                .select()
+                .from(guardians)
+                .where(eq(guardians.email, formData.guardians.email))
+                .limit(1);
+
+            if (existingGuardian.length > 0) {
+                throw new Error(
+                    'A registration already exists for this email address. Please contact us if you believe this is an error.',
+                );
+            }
             // Insert guardian and get the ID
             // We can spread all guardian fields because form structure matches DB schema exactly
             const [guardian] = await db
                 .insert(guardians)
-                .values(formData.guardians)
+                .values({ ...formData.guardians })
                 .returning({ id: guardians.id });
 
             if (!guardian) {
@@ -62,7 +81,7 @@ export const createRegistration = actionClient
 
                 childIds.push(child.id);
 
-                // Insert medical information in separate table if any was provided
+                // Insert medical information in a separate table if any was provided
                 if (
                     medicalInfo &&
                     (medicalInfo.foodAllergies ||
@@ -79,7 +98,7 @@ export const createRegistration = actionClient
                 }
             }
 
-            // Insert consent information for each child (same consent applies to all)
+            // Insert consent information for each child (the same consent applies to all)
             for (const childId of childIds) {
                 await db.insert(consent).values({
                     childId: childId, // Foreign key - not in form (form has consent at top level)
@@ -96,6 +115,22 @@ export const createRegistration = actionClient
                         ...emergencyContact, // firstName, lastName, phonePrimary, relationship
                     });
                 }
+            }
+
+            // Send confirmation email
+            try {
+                const emailHtml = createRegistrationConfirmationEmail(formData);
+                await sendEmail({
+                    to: formData.guardians.email,
+                    subject:
+                        'VBS 2025 Registration Confirmation at Motlow Creek Baptist Church',
+                    html: emailHtml,
+                });
+                console.log(
+                    `Confirmation email sent to ${formData.guardians.email}`,
+                );
+            } catch (emailError) {
+                console.error('Failed to send confirmation email:', emailError);
             }
 
             return {
