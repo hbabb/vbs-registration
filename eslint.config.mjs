@@ -8,11 +8,18 @@ const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
+  recommendedConfig: { extends: ["eslint:recommended"]},
 });
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   eslintConfigPrettier,
+  {
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+    },
+  },
 ];
 
 export default eslintConfig;

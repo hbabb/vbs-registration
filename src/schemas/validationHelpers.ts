@@ -106,6 +106,7 @@ export const stateValidation = z
     .length(2, { message: 'Please select a valid state' })
     .refine(
         state => {
+            // @ts-expect-error - TS doesn't know about the US_STATES array'
             const validState = US_STATES.find(s => s.abbreviation === state);
             return !!validState; // Just check if it exists
         },
