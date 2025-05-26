@@ -3,7 +3,7 @@
 /**
  * src/components/RegistrationForm.tsx
  *
- * Main registration form wrapper component that handles all form logic
+ * Main registration form wrapper part that handles all form logic
  * Contains useForm hook, validation, submission, and renders all form sections
  * This is a client component that wraps server-rendered page content
  * Handles multistep form flow and state management
@@ -23,7 +23,8 @@ import { EmergencyContact } from '../views/EmergencyContact';
 import { GuardianInfo } from '../views/GuardianInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema } from '@/schemas/formSchema';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { trackRegistration, trackFormStep, trackEvent } from '@/lib/analytics';
 
 export function RegistrationForm() {
     // Set sart time for registration
@@ -80,6 +81,10 @@ export function RegistrationForm() {
     // Server action hook for form submission
     const { execute, status } = useAction(createRegistration, {
         onSuccess: data => {
+            // Track successful registration
+            const childrenCount = form.getValues('children').length;
+            trackRegistration(childrenCount);
+
             toast.success(`✅ ${data?.data?.message}`, {
                 style: {
                     background: '#059669', // muted green
@@ -90,6 +95,11 @@ export function RegistrationForm() {
             form.reset();
         },
         onError: error => {
+            // Track form errors
+            trackEvent('registration_error', {
+                event_category: 'VBS Registration',
+                error_message: error.error?.serverError || 'Unknown error',
+            });
             toast.error(
                 `❌ ${error.error?.serverError || 'Registration failed. Please try again'}`,
                 {
@@ -102,6 +112,31 @@ export function RegistrationForm() {
             );
         },
     });
+
+    useEffect(() => {
+        const subscription = form.watch((value, { name }) => {
+            if (
+                name?.startsWith('guardians.firstName') &&
+                value.guardians?.firstName
+            ) {
+                trackFormStep('guardian_info_started');
+            }
+            if (
+                name?.startsWith('children.0.firstName') &&
+                value.children?.[0]?.firstName
+            ) {
+                trackFormStep('child_info_started');
+            }
+            if (
+                name?.startsWith('emergencyContacts.0.firstName') &&
+                value.emergencyContacts?.[0]?.firstName
+            ) {
+                trackFormStep('emergency_contact_started');
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [form]);
 
     // Form submission handler
     const onSubmit = (data: RegistrationFormData) => {
@@ -156,6 +191,8 @@ export function RegistrationForm() {
                                 ? 'Submitting...'
                                 : 'Submit Registration'}
                         </Button>
+                        {/*The line below is for debugging purposes. Uncomment to see form errors*/}
+                        {/*<pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>*/}
                     </div>
                     {/*In your RegistrationForm.tsx, add hidden fields:*/}
                     <div style={{ display: 'none' }}>
@@ -174,6 +211,15 @@ export function RegistrationForm() {
                     </div>
                 </form>
             </Form>
+            {/*Add a privacy notice to your form*/}
+            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h4 className="font-semibold text-blue-800">Privacy Notice</h4>
+                <p className="mt-2 text-sm text-blue-700">
+                    We collect this information solely for VBS registration and
+                    safety purposes. Your data is not shared with third parties
+                    and is deleted after the program ends.
+                </p>
+            </div>
         </div>
     );
 }

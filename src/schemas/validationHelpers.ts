@@ -26,6 +26,7 @@ export const emailValidation = z
     .refine(
         email => {
             // Check for valid TLDs (top-level domains)
+            if (!email.includes('@')) return false;
             const validTLDs = [
                 'com',
                 'org',
@@ -46,6 +47,7 @@ export const emailValidation = z
     .refine(
         email => {
             // Reject obvious fake patterns
+            if (!email.includes('@')) return false;
             const domain = email.split('@')[1];
             const fakeDomains = [
                 'test.com',
@@ -54,7 +56,6 @@ export const emailValidation = z
                 'dummy.com',
             ];
             const hasRepeatingChars = /(.)\1{3,}/.test(domain); // 4+ same chars in domain
-
             return !fakeDomains.includes(domain) && !hasRepeatingChars;
         },
         { message: 'Please enter a real email address' },
@@ -106,8 +107,7 @@ export const stateValidation = z
     .length(2, { message: 'Please select a valid state' })
     .refine(
         state => {
-            // @ts-expect-error - TS doesn't know about the US_STATES array'
-            const validState = US_STATES.find(s => s.abbreviation === state);
+            const validState = US_STATES.find(s => s.value === state);
             return !!validState; // Just check if it exists
         },
         { message: 'Please select a valid state' },

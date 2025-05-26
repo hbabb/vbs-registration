@@ -7,6 +7,7 @@ import './globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import React from 'react';
 import Script from 'next/script';
+import { CookieConsentBanner } from '@/components/page/CookieConsentBanner';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -49,6 +50,7 @@ export default function RootLayout({
                         inter.className,
                     )}>
                     <main>{children}</main>
+                    <CookieConsentBanner />
                     <Toaster richColors />
                     {/* @ts-expect-error - GoogleAnalytics is a valid component */}
                     <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />

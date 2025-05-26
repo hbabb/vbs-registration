@@ -2,5 +2,10 @@
 
 ## Deployment
 
-- [ ] Add analytics for deployment
-- [ ] Setup custom URL
+- [x] Add analytics for deployment
+- [x] Setup custom URL
+
+## Testing
+
+- [ ] Troubleshoot submit button issue
+- [ ] Complete direct testing
