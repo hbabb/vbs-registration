@@ -1,11 +1,3 @@
-/**
- * src/schemas/formSchema.ts
- *
- * Shared Zod schema for registration form validation
- * Updated to support multiple children with embedded medical information
- * Each child can have their own medical information within the same record
- */
-
 import { z } from 'zod';
 import {
     nameValidation,
@@ -75,7 +67,27 @@ export const registrationSchema = z.object({
     honeypot2: z.string().max(0, { message: 'Bot detected' }),
     submissionTime: z
         .number()
-        .min(5000, { message: 'Form submitted too quickly' }),
+        .optional()
+        // @ts-expect-error
+        .refine(
+            (time, ctx) => {
+                // Skip validation in development
+                if (process.env.NODE_ENV === 'development') {
+                    return true;
+                }
+
+                // Skip validation for developer email in production
+                const formData = ctx.path.lenght > 0 ? ctx.parent : ctx.data;
+                if (
+                    formData?.guardians?.email === process.env.DEVELOPER_EMAIL
+                ) {
+                    return true;
+                }
+                // In production, enforce a minimum time
+                return time >= 5000; // 5 seconds
+            },
+            { message: 'Form submitted to quickly' },
+        ),
 });
 
 // Export the inferred type for TypeScript

@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const trackEvent = (
     eventName: string,
     parameters?: Record<string, any>,

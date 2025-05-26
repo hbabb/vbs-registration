@@ -16,7 +16,6 @@ import { type RegistrationFormData } from '@/schemas/formSchema';
 import { useAction } from 'next-safe-action/hooks';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Button } from '../ui/button';
 import { ChildInfo } from '../views/ChildInfo';
 import { Consent } from '../views/Consent';
 import { EmergencyContact } from '../views/EmergencyContact';
@@ -25,6 +24,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema } from '@/schemas/formSchema';
 import { useState, useEffect } from 'react';
 import { trackRegistration, trackFormStep, trackEvent } from '@/lib/analytics';
+import McbcLogo from '@/assets/mcbc-logo/TransparentLogoIcon.svg';
+import Image from 'next/image';
+import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
 
 export function RegistrationForm() {
     // Set sart time for registration
@@ -140,7 +142,11 @@ export function RegistrationForm() {
 
     // Form submission handler
     const onSubmit = (data: RegistrationFormData) => {
-        const submissionTime = Date.now() - startTime;
+        const isDev = process.env.NODE_ENV === 'development';
+        const isDeveloper =
+            data.guardians.email === process.env.DEVELOPER_EMAIL;
+        const submissionTime =
+            isDev || isDeveloper ? 0 : Date.now() - startTime;
         execute({ ...data, submissionTime });
     };
 
@@ -148,19 +154,37 @@ export function RegistrationForm() {
         <div className="mx-auto max-w-4xl space-y-8 p-6">
             {/* Page Header */}
             <div className="space-y-1 rounded-2xl bg-white/80 p-6 text-center shadow-2xl">
-                <h1 className="font-heading text-xl md:text-2xl lg:text-4xl">
-                    Magnified!
-                </h1>
-                <h2 className="font-subheading text-lg md:text-xl lg:text-2xl">
-                    Made to MAGNIFY God!
+                <div className="flex flex-col items-center justify-center gap-0 md:m-0 md:flex-row md:gap-2">
+                    <Image
+                        src={McbcLogo}
+                        alt="Motlow Creek Baptist Church Logo"
+                        width={200}
+                        height={80}
+                        className="h-32 w-56"
+                    />
+                    <div className="flex flex-col items-center justify-center">
+                        <h1 className="font-allura text-church-navy text-lg md:text-4xl">
+                            Motlow Creek Baptist Church
+                        </h1>
+                        <h2 className="mcbc-logo font-roboto text-church-navy text-xs uppercase">
+                            Where faith grows and hearts connect
+                        </h2>
+                        <address className="text-church-navy text-sm">
+                            2300 Motlow Creek Road
+                            <br />
+                            Campobello, SC 29322
+                            <br />
+                        </address>
+                    </div>
+                </div>
+                <h2 className="text-dartmouth-green font-luckiest text-lg uppercase md:text-xl lg:text-2xl">
+                    Vacation Bible School 2025 Registration
                 </h2>
-                <h3 className="text-church-navy text-lg md:text-xl lg:text-2xl">
-                    Vacation Bible School 2025
+                <h3 className="text-marian-blue font-montserrat text-lg md:text-xl lg:text-2xl">
+                    Magnified!!!!
+                    <br />
+                    Made to MAGNIFY God!!!
                 </h3>
-                <p className="text-foreground font-family-montserrat">
-                    Motlow Creek Baptist Church
-                    <br /> VBS 2025 Registration Form
-                </p>
             </div>
 
             {/* Registration Form */}
@@ -182,17 +206,16 @@ export function RegistrationForm() {
 
                     {/* Submit Button */}
                     <div className="justify-start-safe flex pt-4">
-                        <Button
+                        <InteractiveHoverButton
                             type="submit"
-                            size="lg"
                             disabled={status === 'executing'}
                             className="min-w-48">
                             {status === 'executing'
                                 ? 'Submitting...'
                                 : 'Submit Registration'}
-                        </Button>
+                        </InteractiveHoverButton>
                         {/*The line below is for debugging purposes. Uncomment to see form errors*/}
-                        {/*<pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>*/}
+                        {/*<pre className="border border-amber-400 bg-amber-700 text-white font-semibold">{JSON.stringify(form.formState.errors, null, 2)}</pre>*/}
                     </div>
                     {/*In your RegistrationForm.tsx, add hidden fields:*/}
                     <div style={{ display: 'none' }}>
@@ -212,7 +235,7 @@ export function RegistrationForm() {
                 </form>
             </Form>
             {/*Add a privacy notice to your form*/}
-            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50/80 p-4">
                 <h4 className="font-semibold text-blue-800">Privacy Notice</h4>
                 <p className="mt-2 text-sm text-blue-700">
                     We collect this information solely for VBS registration and
