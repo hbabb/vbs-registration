@@ -19,11 +19,6 @@ const eslintConfig = [
       ecmaVersion: 2022,
       sourceType: "module",
     },
-    rules: {
-      "@typescript-eslint/no-empty-object-type": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/ban-ts-comment": "off",
-    },
   },
 ];
 
