@@ -22,7 +22,7 @@ import { EmergencyContact } from '../views/EmergencyContact';
 import { GuardianInfo } from '../views/GuardianInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema } from '@/schemas/formSchema';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { trackRegistration, trackFormStep, trackEvent } from '@/lib/analytics';
 import McbcLogo from '@/assets/mcbc-logo/TransparentLogoIcon.svg';
 import Image from 'next/image';
@@ -30,7 +30,7 @@ import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-b
 
 export function RegistrationForm() {
     // Set sart time for registration
-    const [startTime] = useState(Date.now());
+    // const [startTime] = useState(Date.now());
 
     // Initialize form with react-hook-form and Zod validation
     const form = useForm<RegistrationFormData>({
@@ -77,7 +77,7 @@ export function RegistrationForm() {
             },
             honeypot: '',
             honeypot2: '',
-            submissionTime: 0,
+            // submissionTime: 0,
         },
     });
 
@@ -146,14 +146,14 @@ export function RegistrationForm() {
         console.log('🔥 SUBMIT BUTTON CLICKED!');
         console.log('🔥 Form validation passed!');
 
-        const isDev = process.env.NODE_ENV === 'development';
-        const isDeveloper =
-            data.guardians.email === process.env.DEVELOPER_EMAIL;
-        const submissionTime =
-            isDev || isDeveloper ? 0 : Date.now() - startTime;
+        // const isDev = process.env.NODE_ENV === 'development';
+        // const isDeveloper =
+        //     data.guardians.email === process.env.DEVELOPER_EMAIL;
+        // const submissionTime =
+        //     isDev || isDeveloper ? 0 : Date.now() - startTime;
 
         console.log('🔥 About to call execute()');
-        execute({ ...data, submissionTime });
+        execute({ ...data });
         console.log('Form data: ', JSON.stringify(data, null, 2));
         console.log(
             'Form errors: ',
@@ -226,7 +226,9 @@ export function RegistrationForm() {
                                 : 'Submit Registration'}
                         </InteractiveHoverButton>
                         {/*The line below is for debugging purposes. Uncomment to see form errors*/}
-                        {/*<pre className="border border-amber-400 bg-amber-700 text-white font-semibold">{JSON.stringify(form.formState.errors, null, 2)}</pre>*/}
+                        <pre className="border border-amber-400 bg-amber-700 font-semibold text-white">
+                            {JSON.stringify(form.formState.errors, null, 2)}
+                        </pre>
                     </div>
                     {/*In your RegistrationForm.tsx, add hidden fields:*/}
                     <div style={{ display: 'none' }}>

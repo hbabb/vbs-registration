@@ -108,7 +108,7 @@ export const stateValidation = z
     .refine(
         state => {
             const validState = US_STATES.find(s => s.value === state);
-            return !!validState; // Just check if it exists
+            return !!validState; // Check if it exists
         },
         { message: 'Please select a valid state' },
     );
@@ -124,6 +124,7 @@ export const zipValidation = z
         { message: 'Please enter a valid zip code' },
     );
 
+/*
 export const humanBehaviorValidation = z.object({
     // Detect copy/paste or too-perfect typing
     firstName: nameValidation.refine(
@@ -134,3 +135,4 @@ export const humanBehaviorValidation = z.object({
         { message: 'Please use proper capitalization' },
     ),
 });
+ */
