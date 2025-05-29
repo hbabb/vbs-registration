@@ -65,27 +65,7 @@ export const registrationSchema = z.object({
 
     honeypot: z.string().max(0, { message: 'Bot detected' }),
     honeypot2: z.string().max(0, { message: 'Bot detected' }),
-    //     submissionTime: z.number().optional(),
 });
-/*
-    .refine(
-        data => {
-            // Skip validation in development
-            if (process.env.NODE_ENV === 'development') return true;
-
-            // Skip validation for developer email in production
-            if (data.guardians.email === process.env.DEVELOPER_EMAIL)
-                returns true;
-
-            // In production, enforce a minimum time
-            return data.submissionTime && data.submissionTime >= 5000;
-        },
-        {
-            message: 'Form submitted too quickly',
-            path: ['submissionTime'],
-        },
-    );
-    */
 
 // Export the inferred type for TypeScript
 export type RegistrationFormData = z.infer<typeof registrationSchema>;

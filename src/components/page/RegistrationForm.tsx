@@ -29,9 +29,6 @@ import Image from 'next/image';
 import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
 
 export function RegistrationForm() {
-    // Set sart time for registration
-    // const [startTime] = useState(Date.now());
-
     // Initialize form with react-hook-form and Zod validation
     const form = useForm<RegistrationFormData>({
         resolver: zodResolver(registrationSchema),
@@ -143,22 +140,7 @@ export function RegistrationForm() {
 
     // Form submission handler
     const onSubmit = (data: RegistrationFormData) => {
-        console.log('🔥 SUBMIT BUTTON CLICKED!');
-        console.log('🔥 Form validation passed!');
-
-        // const isDev = process.env.NODE_ENV === 'development';
-        // const isDeveloper =
-        //     data.guardians.email === process.env.DEVELOPER_EMAIL;
-        // const submissionTime =
-        //     isDev || isDeveloper ? 0 : Date.now() - startTime;
-
-        console.log('🔥 About to call execute()');
         execute({ ...data });
-        console.log('Form data: ', JSON.stringify(data, null, 2));
-        console.log(
-            'Form errors: ',
-            JSON.stringify(form.formState.errors, null, 2),
-        );
     };
 
     return (
@@ -225,10 +207,6 @@ export function RegistrationForm() {
                                 ? 'Submitting...'
                                 : 'Submit Registration'}
                         </InteractiveHoverButton>
-                        {/*The line below is for debugging purposes. Uncomment to see form errors*/}
-                        <pre className="border border-amber-400 bg-amber-700 font-semibold text-white">
-                            {JSON.stringify(form.formState.errors, null, 2)}
-                        </pre>
                     </div>
                     {/*In your RegistrationForm.tsx, add hidden fields:*/}
                     <div style={{ display: 'none' }}>

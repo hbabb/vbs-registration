@@ -123,16 +123,3 @@ export const zipValidation = z
         },
         { message: 'Please enter a valid zip code' },
     );
-
-/*
-export const humanBehaviorValidation = z.object({
-    // Detect copy/paste or too-perfect typing
-    firstName: nameValidation.refine(
-        name => {
-            // Reject if all caps or all lowercase (humans usually use a proper case)
-            return name !== name.toUpperCase() && name !== name.toLowerCase();
-        },
-        { message: 'Please use proper capitalization' },
-    ),
-});
- */
